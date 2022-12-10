@@ -1,14 +1,16 @@
 use std::pin::Pin;
-use std::task::{ready, Context, Poll};
+use std::task::{Context, Poll, ready};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use bytes::Bytes;
 use futures::{Stream, StreamExt};
 use postgres_protocol::message::backend::PrimaryKeepAliveBody;
 use prost::Message;
+use tokio_postgres::{CopyBothDuplex, Error, SimpleQueryMessage, SimpleQueryRow};
 use tokio_postgres::replication::ReplicationStream;
 use tokio_postgres::types::PgLsn;
-use tokio_postgres::{CopyBothDuplex, Error, SimpleQueryMessage, SimpleQueryRow};
+
+use crate::decoderbufs::{DatumMessage, TypeInfo};
 
 static MICROSECONDS_FROM_UNIX_EPOCH_TO_2000: u128 = 946_684_800_000_000;
 
@@ -25,13 +27,35 @@ pin_project_lite::pin_project! {
     }
 }
 
+type UntypedColumns = Vec<DatumMessage>;
+
+/// Generic
+#[derive(Debug, Clone)]
+#[allow(dead_code)]
+pub enum Change<T = UntypedColumns> {
+    Insert(T),
+    Update(T, T),
+    Delete(T),
+}
+
+/// Represents a change of one row in the WAL.
+///
+#[derive(Debug, Clone)]
+#[allow(dead_code)]
+pub struct WalRowEntry {
+    change: Change<UntypedColumns>,
+
+    table: String,
+    typeinfo: Vec<TypeInfo>,
+}
+
 #[derive(Debug, Clone)]
 #[allow(dead_code)]
 pub struct WalTransaction {
     pub start: PgLsn,
     pub txid: u32,
     pub commit_time: u64,
-    pub events: Vec<crate::decoderbufs::RowMessage>,
+    pub events: Vec<WalRowEntry>,
 }
 
 #[derive(Debug)]

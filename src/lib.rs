@@ -1,5 +1,5 @@
 pub mod decoderbufs;
-pub(crate) mod serde;
+pub mod serde;
 pub mod stream;
 
 //
