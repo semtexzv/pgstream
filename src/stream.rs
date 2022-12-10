@@ -1,16 +1,18 @@
+pub use tokio_postgres;
+
 use std::pin::Pin;
-use std::task::{Context, Poll, ready};
+use std::task::{ready, Context, Poll};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use bytes::Bytes;
 use futures::{Stream, StreamExt};
 use postgres_protocol::message::backend::PrimaryKeepAliveBody;
 use prost::Message;
-use tokio_postgres::{CopyBothDuplex, Error, SimpleQueryMessage, SimpleQueryRow};
 use tokio_postgres::replication::ReplicationStream;
 use tokio_postgres::types::PgLsn;
+use tokio_postgres::{CopyBothDuplex, Error, SimpleQueryMessage, SimpleQueryRow};
 
-use crate::decoderbufs::{DatumMessage, TypeInfo};
+use crate::decoderbufs::{DatumMessage, RowMessage, TypeInfo};
 
 static MICROSECONDS_FROM_UNIX_EPOCH_TO_2000: u128 = 946_684_800_000_000;
 
@@ -55,7 +57,7 @@ pub struct WalTransaction {
     pub start: PgLsn,
     pub txid: u32,
     pub commit_time: u64,
-    pub events: Vec<WalRowEntry>,
+    pub events: Vec<RowMessage>,
 }
 
 #[derive(Debug)]

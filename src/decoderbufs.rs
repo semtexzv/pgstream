@@ -1,3 +1,4 @@
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Point {
     #[prost(double, required, tag = "1")]
@@ -5,6 +6,7 @@ pub struct Point {
     #[prost(double, required, tag = "2")]
     pub y: f64,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DatumMessage {
     #[prost(string, optional, tag = "1")]
@@ -16,6 +18,7 @@ pub struct DatumMessage {
 }
 /// Nested message and enum types in `DatumMessage`.
 pub mod datum_message {
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Datum {
         #[prost(int32, tag = "3")]
@@ -38,6 +41,7 @@ pub mod datum_message {
         DatumMissing(bool),
     }
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TypeInfo {
     #[prost(string, required, tag = "1")]
@@ -45,6 +49,7 @@ pub struct TypeInfo {
     #[prost(bool, required, tag = "2")]
     pub value_optional: bool,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RowMessage {
     #[prost(uint32, optional, tag = "1")]
